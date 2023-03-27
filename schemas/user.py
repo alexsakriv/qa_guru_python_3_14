@@ -30,3 +30,14 @@ single_user_schema = Schema(
     extra=PREVENT_EXTRA,
     required=True
 )
+
+post_create_user = Schema(
+    {
+        "name": str,
+        "job": str,
+        "id": str,
+        "createdAt": str
+    },
+    extra=PREVENT_EXTRA,
+    required=True
+)

@@ -15,12 +15,13 @@ def test_get_single_user_has_first_name():
     assert response.json().get('data').get('first_name')
 
 
-def test_get_single_user_email_has_reqresru():
+def test_get_single_user_email_has_reqres_ru():
     response = requests.get(url="https://reqres.in/api/users/1")
 
     email = response.json().get('data').get('email')
 
     assert "@reqres.in" in email
+
 
 def test_get_single_user_schema():
     response = requests.get(url="https://reqres.in/api/users/1")
