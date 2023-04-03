@@ -50,23 +50,6 @@ def test_add_product_to_cart(demowebshop):
         browser.element(".product-name").should(have.text('Computing and Internet'))
 
 
-def test_logout(demowebshop):
-    response = demowebshop.post("/login", json={"Email": EMAIL, "Password": PASSWORD},
-                                allow_redirects=False)
-    authorization_cookie = response.cookies.get("NOPCOMMERCE.AUTH")
-
-    browser.open("")
-
-    browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": authorization_cookie})
-    browser.open("")
-
-    with allure.step("Click 'Log out'"):
-        browser.element("[class*='logout']").click()
-
-    with allure.step("Verify successful logout"):
-        browser.element("[class*='login']").should(have.text('Log in'))
-
-
 def test_add_product_to_wishlist(demowebshop):
     response = demowebshop.post("/login", json={"Email": EMAIL, "Password": PASSWORD},
                                 allow_redirects=False)
@@ -100,3 +83,20 @@ def test_customer_info(demowebshop):
         browser.element("#FirstName").should(have.value('alex'))
         browser.element("#LastName").should(have.value('kriv'))
         browser.element("#Email").should(have.value(EMAIL))
+
+
+def test_logout(demowebshop):
+    response = demowebshop.post("/login", json={"Email": EMAIL, "Password": PASSWORD},
+                                allow_redirects=False)
+    authorization_cookie = response.cookies.get("NOPCOMMERCE.AUTH")
+
+    browser.open("")
+
+    browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": authorization_cookie})
+    browser.open("")
+
+    with allure.step("Click 'Log out'"):
+        browser.element("[class*='logout']").click()
+
+    with allure.step("Verify successful logout"):
+        browser.element("[class*='login']").should(have.text('Log in'))
