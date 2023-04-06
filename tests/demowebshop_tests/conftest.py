@@ -6,14 +6,23 @@ from qa_guru_python_3_14.utils.base_session import BaseSession
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from selene.support.shared import browser
+from qa_guru_python_3_14.utils import attach
 
 
 load_dotenv()
+
+EMAIL = os.getenv('EMAIL')
+PASSWORD = os.getenv('PASSWORD')
 
 
 @pytest.fixture(scope="session")
 def demowebshop():
     api_url = os.getenv("API_URL")
+    yield BaseSession(api_url)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def app(demowebshop):
     options = Options()
     selenoid_capabilities = {
         "browserName": "chrome",
@@ -31,10 +40,20 @@ def demowebshop():
 
     browser.config.driver = driver
 
-    return BaseSession(api_url)
+    WEB_URL = os.getenv("WEB_URL")
+    browser.config.base_url = WEB_URL
+    response = demowebshop.post("/login", json={"Email": EMAIL, "Password": PASSWORD}, allow_redirects=False)
+    authorization_cookie = response.cookies.get("NOPCOMMERCE.AUTH")
+    browser.open("/Themes/DefaultClean/Content/images/logo.png")
+    browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": authorization_cookie})
 
+    yield
 
-@pytest.fixture(scope="session")
-def reqresin():
-    api_url = os.getenv("API_URL_PART_1")
-    return BaseSession(api_url)
+    attach.add_html(browser)
+    attach.add_screenshot(browser)
+    attach.add_logs(browser)
+    attach.add_video(browser)
+    browser.quit()
+
+    browser.quit()
+

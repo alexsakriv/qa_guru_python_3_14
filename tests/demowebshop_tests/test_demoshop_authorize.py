@@ -1,4 +1,5 @@
 import os
+import time
 
 import allure
 from selene import have
@@ -7,24 +8,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_URL = os.getenv('API_URL')
-print(f"API_URL={API_URL}")
 WEB_URL = os.getenv("WEB_URL")
-print(f"WEB_URL={WEB_URL}")
 EMAIL = os.getenv('EMAIL')
-PASSWORD = os.getenv('PASSWORD')
 
 browser.config.base_url = WEB_URL
 
 
 def test_login(demowebshop):
-    response = demowebshop.post("/login", json={"Email": EMAIL, "Password": PASSWORD},
-                                allow_redirects=False)
-    authorization_cookie = response.cookies.get("NOPCOMMERCE.AUTH")
-
-    browser.open("/Themes/DefaultClean/Content/images/logo.png")
-
-    browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": authorization_cookie})
     browser.open("")
 
     with allure.step("Verify successful authorization"):
@@ -32,14 +22,6 @@ def test_login(demowebshop):
 
 
 def test_add_product_to_cart(demowebshop):
-    response = demowebshop.post("/login", json={"Email": EMAIL, "Password": PASSWORD},
-                                allow_redirects=False)
-    authorization_cookie = response.cookies.get("NOPCOMMERCE.AUTH")
-
-    browser.open("/books")
-
-    browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": authorization_cookie})
-
     with allure.step("Add prodict to cart"):
         demowebshop.post("/addproducttocart/catalog/13/1/1")
 
@@ -48,18 +30,11 @@ def test_add_product_to_cart(demowebshop):
 
     with allure.step("Verify successful add product to cart"):
         browser.element(".product-name").should(have.text('Computing and Internet'))
+        time.sleep(1)
 
 
 def test_add_product_to_wishlist(demowebshop):
-    response = demowebshop.post("/login", json={"Email": EMAIL, "Password": PASSWORD},
-                                allow_redirects=False)
-    authorization_cookie = response.cookies.get("NOPCOMMERCE.AUTH")
-
-    browser.open("/black-white-diamond-heart")
-
-    browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": authorization_cookie})
-
-    with allure.step("Add prodict to wishlist"):
+    with allure.step("Add product to wishlist"):
         demowebshop.post("/addproducttocart/details/14/2")
 
     with allure.step("Open wishlist"):
@@ -67,16 +42,10 @@ def test_add_product_to_wishlist(demowebshop):
 
     with allure.step("Verify successful add product to wishlist"):
         browser.element(".wishlist-content").should(have.text('Black & White Diamond Heart'))
+        time.sleep(1)
 
 
 def test_customer_info(demowebshop):
-    response = demowebshop.post("/login", json={"Email": EMAIL, "Password": PASSWORD},
-                                allow_redirects=False)
-    authorization_cookie = response.cookies.get("NOPCOMMERCE.AUTH")
-
-    browser.open("/Themes/DefaultClean/Content/images/logo.png")
-
-    browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": authorization_cookie})
     browser.open("/customer/info")
 
     with allure.step("Verify Customer info"):
@@ -86,13 +55,6 @@ def test_customer_info(demowebshop):
 
 
 def test_logout(demowebshop):
-    response = demowebshop.post("/login", json={"Email": EMAIL, "Password": PASSWORD},
-                                allow_redirects=False)
-    authorization_cookie = response.cookies.get("NOPCOMMERCE.AUTH")
-
-    browser.open("")
-
-    browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": authorization_cookie})
     browser.open("")
 
     with allure.step("Click 'Log out'"):
